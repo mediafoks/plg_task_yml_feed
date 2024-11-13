@@ -335,7 +335,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
 
         if (!is_dir($path)) mkdir($path); // проверяем есть ли папка yandex, если нет, создаем ее
         if (isset($data) && !empty($data)) { // если есть данные
-            file_put_contents($path  . '/' . trim($data['filename'], '/') . '.feed.xml', print_r($this->feedRender($data), true)); // то записываем в файл
+            file_put_contents($path  . '/' . trim($data['filename'], '/') . '.feed.xml', $this->feedRender($data)); // то записываем в файл
         }
     }
 
