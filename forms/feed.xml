@@ -5,8 +5,8 @@
             <field name="feed_name" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_DESC" required="false" filter="string" />
             <field name="feed_description" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_DESC" required="false" filter="string" />
             <field name="feed_link" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_DESC" required="false" filter="string" />
-            <field name="currency" type="list" label="PLG_TASK_YMLFEED_FIELD_CURRENCY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CURRENCY_DESC" default="RUR" required="false" filter="string">
-                <option value="RUR">RUR</option>
+            <field name="currency" type="list" label="PLG_TASK_YMLFEED_FIELD_CURRENCY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CURRENCY_DESC" default="RUB" required="false" filter="string">
+                <option value="RUB">RUB</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
             </field>
