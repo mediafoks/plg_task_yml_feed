@@ -114,9 +114,9 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $app = $this->getApplication();
 
         $timezone = new \DateTimeZone($app->get('offset', 'UTC'));
-        $factory_date = Factory::getDate($date);
-        $factory_date->setTimezone($timezone);
-        $newDate = $factory_date->toRFC822(true); // дата в формате RFC822
+        $dateFactory = Factory::getDate($date);
+        $dateFactory->setTimezone($timezone);
+        $newDate = $dateFactory->toRFC822(true); // дата в формате RFC822
 
         return $newDate;
     }
@@ -200,24 +200,25 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         return $linkImg;
     }
 
-    private function itemRender($item, $city, $yearcom)
+    private function itemRender($item, $params)
     {
         $app = $this->getApplication();
         $appParams = ComponentHelper::getParams('com_article');
+
         $factory = $app->bootComponent('com_content')->getMVCFactory();
         $article = $factory->createModel('Article', 'Site', ['ignore_request' => true]);
         $article->setState('params', $appParams);
         $article->setState('article.id', (int) $item->id);
         $articleItem = $article->getItem();
 
-        $itemRating = !empty($articleItem->rating) ?: 0;
-        $itemRatingCount = !empty($articleItem->rating_count) ?: 0;
-
+        $itemRating = !empty($articleItem->rating) ?: 0; // рейтинг
+        $itemRatingCount = !empty($articleItem->rating_count) ?: 0; // счетчик рейтинга
 
         $fields = FieldsHelper::getFields('com_content.article', $item, true); // все custrom fields
-        $itemCurrence = '';
-        $itemPrice = '';
-        $itemSalesNotes = '';
+        $itemCurrence = ''; // валюта
+        $itemPrice = ''; // прайс
+        $itemSalesNotes = ''; // цена за
+
         if (!empty($fields)) {
             foreach ($fields as $field) {
                 if ($field->name == 'price' && !empty($field->value)) {
@@ -232,12 +233,12 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
 
         $sitePath = Path::check($this->siteDirectory . '/');
 
-        $itemLink = $sitePath . $item->category_route . '/' . $item->alias; // адрес канала
+        $itemLink = $sitePath . $item->category_route . '/' . $item->alias; // адрес фида
 
         $images = json_decode($item->images); // массив изображений
         $image_intro = $images->image_intro; // изображение вступительного текста
         $image_fulltext = $images->image_fulltext; // изображение полного текста
-        $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext));
+        $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext)); // изображение фида
 
         return '
         <offer id="' . $item->id . '">
@@ -253,14 +254,17 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
             <vendor>' . htmlspecialchars($item->author, ENT_COMPAT, 'UTF-8', false) . '</vendor>
             <param name="Рейтинг">' . $itemRating . '</param>
             <param name="Число отзывов">' . $itemRatingCount . '</param>'
-            . $this->addInfoRender($city, $yearcom) .
+            . $this->addInfoRender($params) .
             '</offer>';
     }
 
-    private function addInfoRender($city, $yearcom)
+    private function addInfoRender($params)
     {
         $current_date = (new Date('now'))->format('Y'); // текущий год
+        $yearcom = $params->get('yearcom'); // год начала работы компании
         $experience = (int) $current_date - (int) $yearcom; // стаж
+
+        $city = $params->get('city'); // город
 
         return '
         <param name="Регион">' . $city . '</param>
@@ -273,54 +277,67 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         <param name="Безналичный расчет">да</param>';
     }
 
-    private function feedInfoRender($cat)
+    private function feedInfoRender($data)
     {
-        $siteName = Factory::getConfig()->get('sitename');
-        $sitePath = Path::check($this->siteDirectory . '/');
-        $siteEmail = Factory::getConfig()->get('mailfrom');
+        $siteName = Factory::getConfig()->get('sitename'); // имя сайта
+        $sitePath = Path::check($this->siteDirectory . '/'); // адрес сайта
+        $siteEmail = Factory::getConfig()->get('mailfrom'); // email сайта
+
+        $app = $this->getApplication();
+        $categoryFactory = $app->bootComponent('com_content')->getCategory();
+        $category = $categoryFactory->get($data['catids'][0]);
+
+        $params = $data['params'];
+
+        $feedName = $params->get('feed_name') ?: $category->title; // имя фида
+        $feedLink = $params->get('feed_link') ?: $category->alias; // ссылка на фид
+        $feedDescription = $params->get('feed_description') ?: strip_tags($category->description); // описание фида
+        $feedCurrency = $params->get('currency'); // валюта фида
+
 
         return '
-        <name>' . htmlspecialchars($cat['name'], ENT_COMPAT, 'UTF-8', false) . '</name>
+        <name>' . htmlspecialchars($feedName, ENT_COMPAT, 'UTF-8', false) . '</name>
         <company>' . $siteName . '</company>
-        <url>' . $sitePath . trim($cat['link'], '/') . '</url>
+        <url>' . $sitePath . trim($feedLink, '/') . '</url>
         <email>' . $siteEmail . '</email>
-        <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', $this->getRevars($cat['description'])), ENT_COMPAT, 'UTF-8', false) . '</description>
+        <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', $this->getRevars($feedDescription)), ENT_COMPAT, 'UTF-8', false) . '</description>
         <currencies>
-            <currency id="' . $cat['currency'] . '" rate="1"/>
+            <currency id="' . $feedCurrency . '" rate="1"/>
         </currencies>';
     }
 
     private function categoryRender($catid)
     {
         $app = $this->getApplication();
-        $categoryFactory = $app->bootComponent('com_content')->getCategory();
-        $cat = $categoryFactory->get($catid);
-        $catParentId = $cat->getParent()->id !== 'root' ? ' parentId="' . $cat->getParent()->id . '"' : '';
 
-        return '<category id="' . $cat->id . '"' . $catParentId . '>' . $cat->title . '</category>';
+        $categoryFactory = $app->bootComponent('com_content')->getCategory();
+        $category = $categoryFactory->get($catid);
+        $categoryParentId = $category->getParent()->id !== 'root' ? ' parentId="' . $category->getParent()->id . '"' : '';
+
+        return '<category id="' . $category->id . '"' . $categoryParentId . '>' . $category->title . '</category>';
     }
 
     private function feedRender($data)
     {
-        $current_date = new Date('now');
-        $city = $data['city'];
-        $yearcom = $data['yearcom'];
+        $current_date = new Date('now'); // текущая дата
 
-        $categories = '';
+        $params = $data['params'];
+
+        $feedCategories = '';
         foreach ($data['catids'] as $catid) {
-            $categories .= $this->categoryRender($catid);
+            $feedCategories .= $this->categoryRender($catid);
         }
 
         $items = '';
         foreach ($data['items'] as $item) {
-            $items .= $this->itemRender($item, $city, $yearcom);
+            $items .= $this->itemRender($item, $params);
         }
 
         return '<?xml version="1.0" encoding="UTF-8"?>
         <yml_catalog date="' . $this->dateConvert($current_date) . '">
             <shop>'
             . $this->feedInfoRender($data) .
-            '<categories>' . $categories . '</categories>
+            '<categories>' . $feedCategories . '</categories>
             <offers>'
             . $items .
             '</offers>
@@ -333,9 +350,13 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
     {
         $path = Path::check($this->rootDirectory . 'yandex');
 
+        $app = $this->getApplication();
+        $categoryFactory = $app->bootComponent('com_content')->getCategory();
+        $category = $categoryFactory->get($data['catids'][0]);
+
         if (!is_dir($path)) mkdir($path); // проверяем есть ли папка yandex, если нет, создаем ее
         if (isset($data) && !empty($data)) { // если есть данные
-            file_put_contents($path  . '/' . trim($data['filename'], '/') . '.feed.xml', $this->feedRender($data)); // то записываем в файл
+            file_put_contents($path  . '/' . trim($category->alias, '/') . '.feed.xml', $this->feedRender($data)); // то записываем в файл
         }
     }
 
@@ -423,24 +444,10 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
 
         $items = $articles->getItems();
 
-        $categoryFactory = $app->bootComponent('com_content')->getCategory();
-        $cat = $categoryFactory->get($catids[0]);
-
-        $feedName = $params->get('feed_name') ?: $cat->title;
-        $feedLink = $params->get('feed_link') ?: $cat->alias;
-        $feedFileName = $cat->alias;
-        $feedDescription = $params->get('feed_description') ?: strip_tags($cat->description);
-
         $data = [
-            'name' => $feedName,
-            'link' => $feedLink,
-            'description' => $feedDescription,
-            'filename' => $feedFileName,
-            'currency' => $params->get('currency'),
-            'city' => $params->get('city'),
-            'yearcom' => $params->get('year_com'),
             'catids' => $catids,
-            'items' => $items
+            'items' => $items,
+            'params' => $params
         ];
 
         $this->fileSave($data);
