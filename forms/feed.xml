@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fields name="params">
+        <fieldset name="task_params" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_LABEL">
+            <field name="feed_name" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_DESC" required="false" filter="string" />
+            <field name="feed_description" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_DESC" required="false" filter="string" />
+            <field name="feed_link" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_DESC" required="false" filter="string" />
+            <field name="currency" type="list" label="PLG_TASK_YMLFEED_FIELD_CURRENCY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CURRENCY_DESC" default="RUR" required="false" filter="string">
+                <option value="RUR">RUR</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+            </field>
+            <field name="city" type="text" label="PLG_TASK_YMLFEED_FIELD_CITY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CITY_DESC" default="Москва" required="false" filter="string" />
+            <field name="year_com" type="text" label="PLG_TASK_YMLFEED_FIELD_YEARCOM_LABEL" description="PLG_TASK_YMLFEED_FIELD_YEARCOM_DESC" default="2000" required="false" filter="integer" />
+
+            <field name="count" type="number" label="PLG_TASK_YMLFEED_FIELD_COUNT_LABEL" description="PLG_TASK_YMLFEED_FIELD_COUNT_DESC" default="5" filter="integer" min="0" validate="number" />
+
+            <field name="category_filtering_type" type="list" label="PLG_TASK_YMLFEED_FIELD_CATFILTERINGTYPE_LABEL" description="PLG_TASK_YMLFEED_FIELD_CATFILTERINGTYPE_DESC" default="1" filter="integer">
+                <option value="0">PLG_TASK_YMLFEED_OPTION_EXCLUSIVE_VALUE</option>
+                <option value="1">PLG_TASK_YMLFEED_OPTION_INCLUSIVE_VALUE</option>
+            </field>
+
+            <field name="catid" type="category" label="JCATEGORY" extension="com_content" multiple="true" layout="joomla.form.field.list-fancy-select" filter="intarray" class="multipleCategories" />
+
+            <field name="show_child_category_articles" type="list" label="PLG_TASK_YMLFEED_FIELD_SHOWCHILDCATEGORYARTICLES_LABEL" description="PLG_TASK_YMLFEED_FIELD_SHOWCHILDCATEGORYARTICLES_DESC" default="0" filter="integer">
+                <option value="0">PLG_TASK_YMLFEED_OPTION_EXCLUDE_VALUE</option>
+                <option value="1">PLG_TASK_YMLFEED_OPTION_INCLUDE_VALUE</option>
+            </field>
+
+            <field name="levels" type="number" label="PLG_TASK_YMLFEED_FIELD_CATDEPTH_LABEL" default="1" filter="integer" showon="show_child_category_articles:1" />
+
+            <field name="ex_or_include_articles" type="list" label="PLG_TASK_YMLFEED_FIELD_EX_OR_INCLUDE_LABEL" default="0" filter="integer">
+                <option value="0">PLG_TASK_YMLFEED_OPTION_EXCLUDE_VALUE</option>
+                <option value="1">PLG_TASK_YMLFEED_OPTION_INCLUDE_VALUE</option>
+            </field>
+
+            <field name="excluded_articles" type="subform" label="PLG_TASK_YMLFEED_FIELD_EXCLUDEDARTICLES_LABEL" multiple="true" buttons="add,remove" showon="ex_or_include_articles:0" addfieldprefix="Joomla\Component\Content\Administrator\Field">
+                <form>
+                    <field name="id" type="modal_article" label="PLG_TASK_YMLFEED_FIELD_SELECT_ARTICLE_LABEL" select="true" new="false" edit="false" clear="true" />
+                </form>
+            </field>
+
+            <field name="included_articles" type="subform" label="PLG_TASK_YMLFEED_FIELD_INCLUDEDARTICLES_LABEL" multiple="true" buttons="add,remove" showon="ex_or_include_articles:1" addfieldprefix="Joomla\Component\Content\Administrator\Field">
+                <form>
+                    <field name="id" type="modal_article" label="PLG_TASK_YMLFEED_FIELD_SELECT_ARTICLE_LABEL" select="true" new="false" edit="false" clear="true" />
+                </form>
+            </field>
+        </fieldset>
+    </fields>
+</form>
