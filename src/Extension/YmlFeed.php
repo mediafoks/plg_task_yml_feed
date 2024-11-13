@@ -249,7 +249,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
             <sales_notes>' . $itemSalesNotes . '</sales_notes>
             <delivery>true</delivery>
             <picture>' . $itemImageLink . '</picture>
-            <description>' . str_replace('&nbsp;', ' ', strip_tags($this->getRevars($item->introtext))) . '</description>
+            <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', strip_tags($this->getRevars($item->introtext))), ENT_COMPAT, 'UTF-8', false) . '</description>
             <vendor>' . htmlspecialchars($item->author, ENT_COMPAT, 'UTF-8', false) . '</vendor>
             <param name="Рейтинг">' . $itemRating . '</param>
             <param name="Число отзывов">' . $itemRatingCount . '</param>'
@@ -284,7 +284,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         <company>' . $siteName . '</company>
         <url>' . $sitePath . trim($cat['link'], '/') . '</url>
         <email>' . $siteEmail . '</email>
-        <description>' . str_replace('&nbsp;', ' ', $this->getRevars($cat['description'])) . '</description>
+        <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', $this->getRevars($cat['description'])), ENT_COMPAT, 'UTF-8', false) . '</description>
         <currencies>
             <currency id="' . $cat['currency'] . '" rate="1"/>
         </currencies>';
