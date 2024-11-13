@@ -423,15 +423,8 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
 
         $items = $articles->getItems();
 
-        $cat = [];
-        if (
-            empty($params->get('feed_name'))
-            || empty($params->get('feed_link'))
-            || empty($params->get('feed_description'))
-        ) {
-            $categoryFactory = $app->bootComponent('com_content')->getCategory();
-            $cat = $categoryFactory->get($catids[0]);
-        }
+        $categoryFactory = $app->bootComponent('com_content')->getCategory();
+        $cat = $categoryFactory->get($catids[0]);
 
         $feedName = $params->get('feed_name') ?: $cat->title;
         $feedLink = $params->get('feed_link') ?: $cat->alias;
