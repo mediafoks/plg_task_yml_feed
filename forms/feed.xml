@@ -5,6 +5,9 @@
             <field name="feed_name" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_NAME_DESC" required="false" filter="string" />
             <field name="feed_description" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_DESCRIPTION_DESC" required="false" filter="string" />
             <field name="feed_link" type="text" label="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_LABEL" description="PLG_TASK_YMLFEED_FIELD_CHANNEL_LINK_DESC" required="false" filter="string" />
+
+            <field type="spacer" name="myspacer" hr="true"/>
+
             <field name="currency" type="list" label="PLG_TASK_YMLFEED_FIELD_CURRENCY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CURRENCY_DESC" default="RUB" required="false" filter="string">
                 <option value="RUB">RUB</option>
                 <option value="USD">USD</option>
@@ -12,6 +15,8 @@
             </field>
             <field name="city" type="text" label="PLG_TASK_YMLFEED_FIELD_CITY_LABEL" description="PLG_TASK_YMLFEED_FIELD_CITY_DESC" default="Москва" required="false" filter="string" />
             <field name="year_com" type="text" label="PLG_TASK_YMLFEED_FIELD_YEARCOM_LABEL" description="PLG_TASK_YMLFEED_FIELD_YEARCOM_DESC" default="2000" required="false" filter="integer" />
+
+            <field type="spacer" name="myspacer" hr="true"/>
 
             <field name="count" type="number" label="PLG_TASK_YMLFEED_FIELD_COUNT_LABEL" description="PLG_TASK_YMLFEED_FIELD_COUNT_DESC" default="5" filter="integer" min="0" validate="number" />
 
