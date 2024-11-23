@@ -252,7 +252,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext)); // изображение фида
 
         $current_date = (new Date('now'))->format('Y'); // текущий год
-        $yearcom = $params->get('yearcom'); // год начала работы компании
+        $yearcom = $params->get('year_com'); // год начала работы компании
         $experience = (int) $current_date - (int) $yearcom; // стаж
 
         $city = $params->get('city'); // город
