@@ -200,6 +200,17 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         return $linkImg;
     }
 
+    private function tagRender($name, $value, $attr = '')
+    {
+        $attr = !empty($attr) ? ' ' . $attr : '';
+        return '<' . $name . $attr . '>' . $value . '</' . $name . '>' . PHP_EOL;
+    }
+
+    private function tagParamRender($name, $value)
+    {
+        return '<param name="' . $name . '">' . $value . '</param>' . PHP_EOL;
+    }
+
     private function itemRender($item, $params)
     {
         $app = $this->getApplication();
@@ -240,26 +251,6 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $image_fulltext = $images->image_fulltext; // изображение полного текста
         $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext)); // изображение фида
 
-        return '
-        <offer id="' . $item->id . '">
-            <name>' . htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8', false) . '</name>
-            <categoryId>' . $item->catid . '</categoryId>
-            <url>' . $itemLink . '</url>
-            <price from="true">' . $itemPrice . '</price>
-            <currencyId>' . $itemCurrence . '</currencyId>
-            <sales_notes>' . $itemSalesNotes . '</sales_notes>
-            <delivery>true</delivery>
-            <picture>' . $itemImageLink . '</picture>
-            <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', strip_tags($this->getRevars($item->introtext))), ENT_COMPAT, 'UTF-8', false) . '</description>
-            <vendor>' . htmlspecialchars($item->author, ENT_COMPAT, 'UTF-8', false) . '</vendor>
-            <param name="Рейтинг">' . $itemRating . '</param>
-            <param name="Число отзывов">' . $itemRatingCount . '</param>'
-            . $this->addInfoRender($params) .
-            '</offer>';
-    }
-
-    private function addInfoRender($params)
-    {
         $current_date = (new Date('now'))->format('Y'); // текущий год
         $yearcom = $params->get('yearcom'); // год начала работы компании
         $experience = (int) $current_date - (int) $yearcom; // стаж
@@ -267,14 +258,29 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $city = $params->get('city'); // город
 
         return '
-        <param name="Регион">' . $city . '</param>
-        <param name="Годы опыта">' . $experience . '</param>
-        <param name="Конверсия">1.935</param>
-        <param name="Выезд на дом">да</param>
-        <param name="Бригада">да</param>
-        <param name="Работа по договору">да</param>
-        <param name="Наличный расчет">да</param>
-        <param name="Безналичный расчет">да</param>';
+        <offer id="' . $item->id . '">'
+            . $this->tagRender('name', htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8', false))
+            . $this->tagRender('categoryId', $item->catid)
+            . $this->tagRender('url', $itemLink)
+            . $this->tagRender('price', $itemPrice, 'from="true"')
+            . $this->tagRender('currencyId', $itemCurrence)
+            . $this->tagRender('sales_notes', $itemSalesNotes)
+            . $this->tagRender('delivery', true)
+            . $this->tagRender('picture', $itemImageLink)
+            . $this->tagRender('description', htmlspecialchars(str_replace('&nbsp;', ' ', strip_tags($this->getRevars($item->introtext))), ENT_COMPAT, 'UTF-8', false))
+            . $this->tagRender('vendor', htmlspecialchars($item->author, ENT_COMPAT, 'UTF-8', false))
+            . $this->tagParamRender('Рейтинг', $itemRating)
+            . $this->tagParamRender('Число отзывов', $itemRatingCount)
+            . $this->tagParamRender('Регион', $city)
+            . $this->tagParamRender('Годы опыта', $experience)
+            . $this->tagParamRender('Конверсия', $itemRatingCount)
+            . $this->tagParamRender('Число отзывов', 1.935)
+            . $this->tagParamRender('Выезд на дом', 'да')
+            . $this->tagParamRender('Бригада', 'да')
+            . $this->tagParamRender('Работа по договору', 'да')
+            . $this->tagParamRender('Наличный расчет', 'да')
+            . $this->tagParamRender('Безналичный расчет', 'да') .
+            '</offer>';
     }
 
     private function feedInfoRender($data)
@@ -295,13 +301,12 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $feedCurrency = $params->get('currency'); // валюта фида
 
 
-        return '
-        <name>' . htmlspecialchars($feedName, ENT_COMPAT, 'UTF-8', false) . '</name>
-        <company>' . $siteName . '</company>
-        <url>' . $sitePath . trim($feedLink, '/') . '</url>
-        <email>' . $siteEmail . '</email>
-        <description>' . htmlspecialchars(str_replace('&nbsp;', ' ', $this->getRevars($feedDescription)), ENT_COMPAT, 'UTF-8', false) . '</description>
-        <currencies>
+        return $this->tagRender('name', htmlspecialchars($feedName, ENT_COMPAT, 'UTF-8', false))
+            . $this->tagRender('company', $siteName)
+            . $this->tagRender('url', $sitePath . trim($feedLink, '/'))
+            . $this->tagRender('email', $siteEmail)
+            . $this->tagRender('description', htmlspecialchars(str_replace('&nbsp;', ' ', $this->getRevars($feedDescription)), ENT_COMPAT, 'UTF-8', false)) .
+            '<currencies>
             <currency id="' . $feedCurrency . '" rate="1"/>
         </currencies>';
     }
