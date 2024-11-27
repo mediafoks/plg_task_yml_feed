@@ -251,6 +251,8 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $image_fulltext = $images->image_fulltext; // изображение полного текста
         $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext)); // изображение фида
 
+        $itemDescription = $item->introtext ?: $item->description; // description фида
+
         $current_date = (new Date('now'))->format('Y'); // текущий год
         $yearcom = $params->get('year_com'); // год начала работы компании
         $experience = (int) $current_date - (int) $yearcom; // стаж
@@ -267,7 +269,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
             . $this->tagRender('sales_notes', $itemSalesNotes)
             . $this->tagRender('delivery', true)
             . $this->tagRender('picture', $itemImageLink)
-            . $this->tagRender('description', htmlspecialchars(str_replace('&nbsp;', ' ', strip_tags($this->getRevars($item->introtext))), ENT_COMPAT, 'UTF-8', false))
+            . $this->tagRender('description', htmlspecialchars(str_replace('&nbsp;', ' ', strip_tags($this->getRevars($itemDescription))), ENT_COMPAT, 'UTF-8', false))
             . $this->tagRender('vendor', htmlspecialchars($item->author, ENT_COMPAT, 'UTF-8', false))
             . $this->tagParamRender('Рейтинг', $itemRating)
             . $this->tagParamRender('Число отзывов', $itemRatingCount)
