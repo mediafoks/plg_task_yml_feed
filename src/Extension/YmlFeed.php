@@ -251,7 +251,7 @@ class YmlFeed extends CMSPlugin implements SubscriberInterface
         $image_fulltext = $images->image_fulltext; // изображение полного текста
         $itemImageLink = $this->setImage($this->realCleanImageURL($image_intro ?: $image_fulltext)); // изображение фида
 
-        $itemDescription = $item->introtext ?: $item->description; // description фида
+        $itemDescription = $item->introtext ?: $item->metadesc; // description фида
 
         $current_date = (new Date('now'))->format('Y'); // текущий год
         $yearcom = $params->get('year_com'); // год начала работы компании
